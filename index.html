@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>블로그 분석기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>블로그 분석기</h1>
+        <p>분석할 블로그의 종류를 선택하고 URL을 입력하세요.</p>
+
+        <div class="form-group">
+            <label for="blog-type">블로그 종류</label>
+            <select id="blog-type">
+                <option value="naver">네이버 블로그</option>
+                <option value="tistory">티스토리 블로그</option>
+                <option value="wordpress">워드프레스 블로그</option>
+                <option value="website">기타 웹사이트</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="blog-url">블로그 URL</label>
+            <input type="url" id="blog-url" placeholder="https://example.com">
+        </div>
+
+        <button id="analyze-btn">분석하기</button>
+
+        <div id="result" class="hidden">
+            <h2>분석 결과</h2>
+            <p id="result-text"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,690 @@
+/* ===== 메뉴 반응형 UI/UX ===== */
+.main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.main-nav ul li a {
+    color: #222;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.main-nav ul li a:hover {
+    background: #f0f0f0;
+}
+
+/* 햄버거 버튼 */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 12001;
+    margin-left: 1rem;
+}
+
+.mobile-menu-btn span {
+    display: block;
+    width: 26px;
+    height: 3px;
+    margin: 4px 0;
+    background: #222;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+/* 오버레이 메뉴 */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(20, 20, 20, 0.98);
+    z-index: 12000;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 60px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.mobile-menu-overlay.active {
+    display: flex;
+    animation: fadeIn 0.2s;
+}
+
+.mobile-menu-header {
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem 1.5rem 2rem;
+}
+
+.mobile-menu-title {
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    cursor: pointer;
+}
+
+.mobile-menu-overlay ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.mobile-menu-overlay ul li a {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.mobile-menu-overlay ul li a:hover {
+    background: #333;
+}
+
+@media (max-width: 1024px) {
+    .main-nav.desktop-nav {
+        display: none !important;
+    }
+
+    .mobile-menu-btn {
+        display: flex !important;
+    }
+
+    .mobile-menu-overlay {
+        display: none;
+    }
+
+    .mobile-menu-overlay.active {
+        display: flex;
+    }
+}
+
+@media (min-width: 1025px) {
+
+    .mobile-menu-btn,
+    .mobile-menu-overlay {
+        display: none !important;
+    }
+
+    .main-nav.desktop-nav {
+        display: flex !important;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 데스크톱에서 모바일 메뉴 완전 숨김 */
+@media (min-width: 1025px) {
+
+    .menu-toggle,
+    #primary-menu-container {
+        display: none !important;
+    }
+}
+
+/* 헤더 높이 및 메뉴 배치 개선 */
+.site-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    padding: 0;
+}
+
+.site-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    padding: 0 1.5rem;
+}
+
+.site-branding {
+    margin: 0;
+}
+
+.site-title {
+    font-size: 1.6rem;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.desktop-menu {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.desktop-menu li a {
+    color: #222;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.desktop-menu li a:hover {
+    background: #f0f0f0;
+}
+
+/* 모바일 메뉴는 데스크톱에서 완전히 숨김 */
+.menu-toggle,
+#primary-menu-container {
+    display: none !important;
+}
+
+@media (max-width: 1024px) {
+    .site-header-inner {
+        flex-direction: row;
+        min-height: 54px;
+        padding: 0 1rem;
+    }
+
+    .desktop-menu {
+        display: none !important;
+    }
+
+    .menu-toggle {
+        display: inline-block !important;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: 1rem;
+        z-index: 11001;
+    }
+
+    .menu-toggle .icon-bar {
+        display: block;
+        width: 24px;
+        height: 3px;
+        margin: 4px 0;
+        background: #222;
+        border-radius: 2px;
+        transition: all 0.3s;
+    }
+
+    #primary-menu-container {
+        display: flex !important;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(20, 20, 20, 0.98);
+        z-index: 11000;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 60px;
+        width: 100vw;
+        height: 100vh;
+        animation: fadeIn 0.2s;
+    }
+
+    #primary-menu-container:not(.active) {
+        display: none !important;
+    }
+
+    #primary-menu-container .close-toggle {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2.2rem;
+        cursor: pointer;
+        position: absolute;
+        top: 18px;
+        right: 24px;
+    }
+
+    #primary-menu-container .nav-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        width: 100vw;
+        margin-top: 2rem;
+    }
+
+    #primary-menu-container .nav-menu li a {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    #primary-menu-container .nav-menu li a:hover {
+        background: #333;
+    }
+
+    #primary-menu-container .menu-title {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100vw;
+        min-height: 2.2rem;
+    }
+}
+
+/* 데스크톱: 메뉴 항상 보이기 */
+.main-navigation .nav-menu {
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: none;
+}
+
+.main-navigation .nav-menu li a {
+    color: #222 !important;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.main-navigation .nav-menu li a:hover {
+    background: #f0f0f0;
+}
+
+.menu-toggle,
+.primary-menu-container {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .main-navigation .nav-menu {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: inline-block;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: 1rem;
+        z-index: 11001;
+    }
+
+    .primary-menu-container {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(20, 20, 20, 0.98);
+        z-index: 11000;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 60px;
+        width: 100vw;
+        height: 100vh;
+        animation: fadeIn 0.2s;
+    }
+
+    .primary-menu-container.active {
+        display: flex !important;
+    }
+
+    .primary-menu-container .close-toggle {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2.2rem;
+        cursor: pointer;
+        position: absolute;
+        top: 18px;
+        right: 24px;
+    }
+
+    .primary-menu-container .nav-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        width: 100vw;
+        margin-top: 2rem;
+    }
+
+    .primary-menu-container .nav-menu li a {
+        color: #fff !important;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .primary-menu-container .nav-menu li a:hover {
+        background: #333;
+    }
+
+    .primary-menu-container .menu-title {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100vw;
+        min-height: 2.2rem;
+    }
+}
+
+/* 나눔스퀘어 폰트 적용 */
+@import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-subset.css');
+
+@font-face {
+    font-family: 'NanumSquare';
+    src: url('https://cdn.jsdelivr.net/gh/hiun/NanumSquare@1.0/NanumSquareR.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+    font-family: 'NanumSquare', 'D2Coding', 'Malgun Gothic', 'Apple SD Gothic Neo', Arial, sans-serif;
+    background: #f9f9fa;
+    color: #222;
+}
+
+/* 언론사 스타일 */
+.site-header {
+    background: #fff;
+    border-bottom: 2px solid #222;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.site-title a {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #222;
+    letter-spacing: -1px;
+    text-decoration: none;
+}
+
+/* 메뉴 스타일 */
+.main-navigation .nav-menu {
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.main-navigation .nav-menu li a {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #222;
+    text-decoration: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.main-navigation .nav-menu li a:hover {
+    background: #f0f0f0;
+}
+
+/* 햄버거/오버레이 메뉴 반응형 */
+.menu-toggle,
+.primary-menu-container {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .main-navigation .nav-menu {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: inline-block;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: 1rem;
+        z-index: 11001;
+    }
+
+    .menu-toggle .icon-bar {
+        display: block;
+        width: 28px;
+        height: 4px;
+        margin: 5px 0;
+        background: #222;
+        border-radius: 2px;
+        transition: all 0.3s;
+    }
+
+    .primary-menu-container {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(20, 20, 20, 0.98);
+        z-index: 11000;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 60px;
+        width: 100vw;
+        height: 100vh;
+        animation: fadeIn 0.2s;
+    }
+
+    .primary-menu-container .close-toggle {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2.2rem;
+        cursor: pointer;
+        position: absolute;
+        top: 18px;
+        right: 24px;
+    }
+
+    .primary-menu-container .nav-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        width: 100vw;
+        margin-top: 2rem;
+    }
+
+    .primary-menu-container .nav-menu li a {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .primary-menu-container .nav-menu li a:hover {
+        background: #333;
+    }
+
+    .primary-menu-container .menu-title {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100vw;
+        min-height: 2.2rem;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f9;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: bold;
+}
+
+select,
+input[type="url"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#result {
+    margin-top: 2rem;
+    text-align: left;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.hidden {
+    display: none;
+}
