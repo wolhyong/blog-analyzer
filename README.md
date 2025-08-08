@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+=======
+AI-powered SEO/AEO analyzer to help your blog rank higher in search results.
+
+MIT License
+
+Copyright (c) 2025 wolhyong
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software...
+
+>>>>>>> main
 const readme = `
 # 🚀 블로그 SEO/AEO 분석기
 
@@ -113,4 +124,8 @@ console.log(`
    ✅ 실시간 콘텐츠 분석
    ✅ 플랫폼별 최적화
    ✅ 서버리스 아키텍처
+<<<<<<< HEAD
 `);
+=======
+`);
+>>>>>>> main
