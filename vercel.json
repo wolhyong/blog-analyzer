@@ -1,4 +1,6 @@
-const vercelConfig = {
+{
+    "version": 2,
+    "public": true,
     "functions": {
         "api/analyze.js": {
             "maxDuration": 30
@@ -22,5 +24,12 @@ const vercelConfig = {
                 }
             ]
         }
+    ],
+    "builds": [],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/docs/$1"
+        }
     ]
-};
+}
