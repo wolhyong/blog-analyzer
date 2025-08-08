@@ -1,5 +1,10 @@
-# python web server 시작
-python -m http.server
+AI-powered SEO/AEO analyzer to help your blog rank higher in search results.
+
+MIT License
+
+Copyright (c) 2025 wolhyong
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software...
 
 const readme = `
 # 🚀 블로그 SEO/AEO 분석기
