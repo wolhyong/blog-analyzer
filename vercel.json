@@ -3,7 +3,9 @@
     "public": true,
     "functions": {
         "api/analyze.js": {
-            "maxDuration": 30
+            "maxDuration": 60,
+            "memory": 1024,
+            "runtime": "nodejs18.x"
         }
     },
     "headers": [
@@ -25,11 +27,14 @@
             ]
         }
     ],
-    "builds": [],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "/docs/$1"
+            "source": "/api/:path*",
+            "destination": "/api/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/docs/$1"
         }
     ]
 }

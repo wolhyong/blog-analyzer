@@ -1,18 +1,20 @@
-const packageJson = {
+{
     "name": "blog-analyzer",
     "version": "1.0.0",
     "description": "AI 기반 블로그 SEO/AEO 분석기",
-    "main": "index.html",
+    "private": true,
     "scripts": {
-        "dev": "vercel dev",
-        "build": "vercel build",
-        "deploy": "vercel --prod"
+        "dev": "vercel dev --yes",
+        "build": "echo \"No build step\"",
+        "vercel-build": "echo \"No build step\"",
+        "deploy": "vercel --prod --yes"
     },
     "dependencies": {
-        "puppeteer": "^21.5.2",
+        "@sparticuz/chromium": "^119.0.2",
+        "axios": "^1.6.2",
         "cheerio": "^1.0.0-rc.12",
         "cors": "^2.8.5",
-        "axios": "^1.6.2"
+        "puppeteer-core": "^21.5.2"
     },
     "devDependencies": {
         "vercel": "^32.5.0"
@@ -20,4 +22,4 @@ const packageJson = {
     "engines": {
         "node": "18.x"
     }
-};
+}
