@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const resultText = document.getElementById('result-text');
 
     // GitHub Pages에서 사용할 경우, index.html에 아래와 같이 설정 가능
-    // <script>window.API_BASE = 'https://YOUR_VERCEL_APP.vercel.app'</script>
+    <script>window.API_BASE = 'https://blog-analyzer-tau.vercel.app'</script>
     const API_BASE = (window.API_BASE || '').replace(/\/$/, '');
 
     async function callAnalyzeAPI(url, platform) {
