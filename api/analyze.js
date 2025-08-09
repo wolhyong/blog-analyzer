@@ -202,14 +202,10 @@ module.exports = async (req, res) => {
         // 크롤링 실행 (서버리스 안정성 강화를 위해 폴백 우선)
         const scraper = new BlogScraper();
         const scrapedData = await scraper.scrape(url, platform);
-
-        if (!scrapedData.success) {
-            return res.status(200).json({
-                success: false,
-                error: '크롤링 실패',
-                details: scrapedData.error
-            });
+        if (!scrapedData || scrapedData.success === false) {
+            return res.status(200).json({ success: false, error: '크롤링 실패', details: scrapedData?.error || 'unknown' });
         }
+
 
         // AI 분석 실행
         const analysis = analyzeContent(scrapedData);
@@ -230,7 +226,7 @@ module.exports = async (req, res) => {
         return res.status(200).json({
             success: false,
             error: '서버 오류가 발생했습니다',
-            details: error.message
+            details: (error && (error.stack || error.message)) || 'unknown'
         });
     }
 };

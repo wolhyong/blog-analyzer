@@ -35,37 +35,83 @@ class BlogScraper {
     }
 
     async fallbackScrape(url, platformHint) {
-        const response = await axios.get(url, { timeout: 15000, headers: { 'User-Agent': 'Mozilla/5.0' } });
-        const html = response.data || '';
-        const $ = cheerio.load(html);
-        let title = $('h1').first().text().trim() || $('title').first().text().trim() || '제목을 찾을 수 없습니다';
-        // 본문 후보 선택자
-        const selectors = ['article', 'main', '.content', '.post', '.entry', 'body'];
-        let content = '';
-        for (const sel of selectors) {
-            const el = $(sel).first();
-            if (el && el.text()) {
-                content = el.text().replace(/\s+/g, ' ').trim();
-                if (content.length > 200) break;
+        try {
+            const headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Connection': 'keep-alive'
+            };
+            const response = await axios.get(url, { timeout: 20000, headers });
+            let html = response.data || '';
+            let $ = cheerio.load(html);
+
+            // 네이버 블로그: iframe(mainFrame) 내부로 이동하여 실제 본문 파싱
+            const mainFrame = $('#mainFrame').attr('src');
+            if (mainFrame) {
+                const frameUrl = new URL(mainFrame, url).toString();
+                const frameRes = await axios.get(frameUrl, { timeout: 20000, headers });
+                html = frameRes.data || '';
+                $ = cheerio.load(html);
             }
+
+            // 제목 추출
+            let title = (
+                $('.se-title-text').first().text().trim() ||
+                $('.post-title').first().text().trim() ||
+                $('h1').first().text().trim() ||
+                $('title').first().text().trim() ||
+                '제목을 찾을 수 없습니다'
+            );
+
+            // 본문 추출
+            const contentSelectors = [
+                '.se-main-container',
+                '.post-view',
+                '.se_component_wrap',
+                '.se_textarea',
+                '.entry-content',
+                'article',
+                'main',
+                '.content',
+                '.post',
+                '.entry',
+                'body'
+            ];
+            let content = '';
+            for (const sel of contentSelectors) {
+                const el = $(sel).first();
+                if (el && el.text()) {
+                    content = el.text().replace(/\s+/g, ' ').trim();
+                    if (content.length > 200) break;
+                }
+            }
+
+            const imageCount = $('img').length;
+            const linkCount = $('a[href]').length;
+            const charWithSpace = content.length;
+            const charWithoutSpace = content.replace(/\s/g, '').length;
+            const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
+
+            return {
+                platform: platformHint || 'website',
+                title,
+                content: content || '본문을 찾을 수 없습니다',
+                charWithSpace,
+                charWithoutSpace,
+                wordCount,
+                imageCount,
+                linkCount,
+                scrapingMethod: mainFrame ? 'fallback: iframe inner (naver) + cheerio' : 'fallback: axios + cheerio',
+                success: true
+            };
+        } catch (error) {
+            return {
+                platform: platformHint || 'website',
+                success: false,
+                error: error?.message || 'fallback 크롤링 실패'
+            };
         }
-        const imageCount = $('img').length;
-        const linkCount = $('a[href]').length;
-        const charWithSpace = content.length;
-        const charWithoutSpace = content.replace(/\s/g, '').length;
-        const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
-        return {
-            platform: platformHint || 'website',
-            title,
-            content: content || '본문을 찾을 수 없습니다',
-            charWithSpace,
-            charWithoutSpace,
-            wordCount,
-            imageCount,
-            linkCount,
-            scrapingMethod: 'fallback: axios + cheerio',
-            success: true
-        };
     }
 
     async scrapeNaverBlog(url) {
