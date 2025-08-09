@@ -181,20 +181,20 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // POST 본문이 없는 경우 대비 (일부 프록시/브라우저 환경)
-        if (!req.body || typeof req.body !== 'object') {
-            try {
-                req.body = JSON.parse(req.rawBody || '{}');
-            } catch (_) {
-                // 무시하고 기존 처리로 진행
-            }
+        // 본문 안전 파싱
+        let body = req.body;
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch (_) { body = {}; }
+        }
+        if (!body || typeof body !== 'object') {
+            body = {};
         }
 
         const BlogScraper = require('./scraper');
-        const { url, platform } = req.body;
+        const { url, platform } = body;
 
         if (!url || !platform) {
-            return res.status(400).json({ error: 'URL and platform are required' });
+            return res.status(200).json({ success: false, error: 'URL and platform are required' });
         }
 
         console.log(`분석 시작: ${platform} - ${url}`);
@@ -223,7 +223,7 @@ module.exports = async (req, res) => {
 
         console.log('분석 완료:', { url, platform, score: result.overall });
 
-        return res.status(200).json(result);
+        return res.status(200).json({ success: true, ...result });
 
     } catch (error) {
         console.error('분석 중 오류:', error);
