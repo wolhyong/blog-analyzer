@@ -1,3 +1,15 @@
+// 런타임 웹 API 폴리필 (Node 18 환경에서 File/FormData 미정의 문제 대응)
+try {
+    const { fetch, Headers, Request, Response, FormData, File, Blob } = require('undici');
+    if (typeof globalThis.fetch === 'undefined') globalThis.fetch = fetch;
+    if (typeof globalThis.Headers === 'undefined') globalThis.Headers = Headers;
+    if (typeof globalThis.Request === 'undefined') globalThis.Request = Request;
+    if (typeof globalThis.Response === 'undefined') globalThis.Response = Response;
+    if (typeof globalThis.FormData === 'undefined') globalThis.FormData = FormData;
+    if (typeof globalThis.File === 'undefined') globalThis.File = File;
+    if (typeof globalThis.Blob === 'undefined') globalThis.Blob = Blob;
+} catch (_) { /* ignore */ }
+
 // BlogScraper는 OPTIONS 등 프리플라이트에서 불필요한 모듈 로딩을 유발할 수 있으므로
 // 실제 POST 처리 시점에 동적 로드합니다.
 
