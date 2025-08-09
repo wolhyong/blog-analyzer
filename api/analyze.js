@@ -160,10 +160,16 @@ function generateImprovementSuggestions(platform, score) {
 
 // Vercel 서버리스 함수 핸들러
 module.exports = async (req, res) => {
-    // CORS 헤더 설정
+    // CORS 헤더 설정 (프리플라이트 포함, 동적 헤더 반영)
+    const requestOrigin = req.headers.origin || '*';
+    const requestedHeaders = req.headers['access-control-request-headers'];
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        requestedHeaders || 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Referer, User-Agent, sec-ch-ua, sec-ch-ua-platform, sec-ch-ua-mobile'
+    );
+    res.setHeader('Vary', 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
