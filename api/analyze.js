@@ -211,11 +211,7 @@ module.exports = async (req, res) => {
         const analysis = analyzeContent(scrapedData);
 
         // 결과 반환
-        const result = {
-            ...scrapedData,
-            ...analysis,
-            timestamp: new Date().toISOString()
-        };
+        const result = Object.assign({}, scrapedData, analysis, { timestamp: new Date().toISOString() });
 
         console.log('분석 완료:', { url, platform, score: result.overall });
 

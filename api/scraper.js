@@ -40,7 +40,8 @@ class BlogScraper {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'Connection': 'keep-alive'
+                'Connection': 'keep-alive',
+                'Referer': url
             };
             const response = await axios.get(url, { timeout: 20000, headers });
             let html = response.data || '';
@@ -106,11 +107,37 @@ class BlogScraper {
                 success: true
             };
         } catch (error) {
-            return {
-                platform: platformHint || 'website',
-                success: false,
-                error: error?.message || 'fallback 크롤링 실패'
-            };
+            // 1차 실패 시 Jina reader를 통한 프록시 텍스트 추출 시도
+            try {
+                const proxyUrl = `https://r.jina.ai/http://${url.replace(/^https?:\/\//, '')}`;
+                const proxyRes = await axios.get(proxyUrl, { timeout: 15000 });
+                const text = (proxyRes.data || '').toString();
+                const sanitized = text.replace(/\s+/g, ' ').trim();
+                const titleMatch = sanitized.match(/^(.*?)(\n|\.)/);
+                const title = (titleMatch && titleMatch[1] && titleMatch[1].slice(0, 120)) || '제목을 찾을 수 없습니다';
+                const content = sanitized.slice(0, 8000);
+                const charWithSpace = content.length;
+                const charWithoutSpace = content.replace(/\s/g, '').length;
+                const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
+                return {
+                    platform: platformHint || 'website',
+                    title,
+                    content: content || '본문을 찾을 수 없습니다',
+                    charWithSpace,
+                    charWithoutSpace,
+                    wordCount,
+                    imageCount: 0,
+                    linkCount: 0,
+                    scrapingMethod: 'fallback: r.jina.ai proxy text',
+                    success: true
+                };
+            } catch (e2) {
+                return {
+                    platform: platformHint || 'website',
+                    success: false,
+                    error: (error && error.message) || (e2 && e2.message) || 'fallback 크롤링 실패'
+                };
+            }
         }
     }
 
