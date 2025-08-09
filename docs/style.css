@@ -440,22 +440,16 @@
     }
 }
 
-/* 나눔스퀘어 폰트 적용 */
+/* 폰트 적용: 시스템/구글 폰트 사용 (외부 404 방지) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-subset.css');
-
-@font-face {
-    font-family: 'NanumSquare';
-    src: url('https://cdn.jsdelivr.net/gh/hiun/NanumSquare@1.0/NanumSquareR.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
 
 body,
 button,
 input,
 select,
 textarea {
-    font-family: 'NanumSquare', 'D2Coding', 'Malgun Gothic', 'Apple SD Gothic Neo', Arial, sans-serif;
+    font-family: 'Noto Sans KR', 'D2Coding', 'Malgun Gothic', 'Apple SD Gothic Neo', Arial, sans-serif;
     background: #f9f9fa;
     color: #222;
 }
