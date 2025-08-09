@@ -221,7 +221,7 @@ module.exports = async (req, res) => {
 
         // URL 형식 검증
         try { new URL(url); } catch (e) {
-            return res.status(200).json({ success: false, error: '잘못된 URL 형식입니다', details: `value=${JSON.stringify(url).slice(0,120)}` });
+            return res.status(200).json({ success: false, error: '잘못된 URL 형식입니다', details: `value=${JSON.stringify(url).slice(0, 120)}` });
         }
 
         console.log(`분석 시작: ${platform} - ${url}`);

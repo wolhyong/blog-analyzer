@@ -1,7 +1,17 @@
 const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
-const cheerio = require('cheerio');
 const axios = require('axios');
+
+// Node 18 런타임에서 File/FormData/Blob 미정의 이슈를 먼저 폴리필해야
+// 이후 로드되는 모듈(cheerio의 하위 의존인 undici 등)에서 ReferenceError가 발생하지 않습니다.
+try {
+  const { FormData, File, Blob } = require('undici');
+  if (typeof globalThis.FormData === 'undefined') globalThis.FormData = FormData;
+  if (typeof globalThis.File === 'undefined') globalThis.File = File;
+  if (typeof globalThis.Blob === 'undefined') globalThis.Blob = Blob;
+} catch (_) { /* ignore */ }
+
+const cheerio = require('cheerio');
 
 class BlogScraper {
     constructor() {
