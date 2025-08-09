@@ -213,12 +213,12 @@ module.exports = async (req, res) => {
         // 결과 반환
         const result = Object.assign({}, scrapedData, analysis, { timestamp: new Date().toISOString() });
 
-        console.log('분석 완료:', { url, platform, score: result.overall });
+        console.log('분석 완료:', { url, platform, score: result.overall, method: scrapedData.scrapingMethod });
 
         return res.status(200).json({ success: true, ...result });
 
     } catch (error) {
-        console.error('분석 중 오류:', error);
+        console.error('분석 중 오류:', error && error.stack ? error.stack : error);
         return res.status(200).json({
             success: false,
             error: '서버 오류가 발생했습니다',

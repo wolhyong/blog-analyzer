@@ -43,7 +43,7 @@ class BlogScraper {
                 'Connection': 'keep-alive',
                 'Referer': url
             };
-            const response = await axios.get(url, { timeout: 20000, headers });
+            const response = await axios.get(url, { timeout: 20000, headers, maxRedirects: 5, validateStatus: s => s >= 200 && s < 400 });
             let html = response.data || '';
             let $ = cheerio.load(html);
 
@@ -53,6 +53,15 @@ class BlogScraper {
                 const frameUrl = new URL(mainFrame, url).toString();
                 const frameRes = await axios.get(frameUrl, { timeout: 20000, headers });
                 html = frameRes.data || '';
+                $ = cheerio.load(html);
+            }
+
+            // 네이버 전용: blogId/logNo 추출 후 모바일 페이지로 수집 (iframe 우회)
+            const naverIds = extractNaverIds(url, mainFrame);
+            if (naverIds) {
+                const mobileUrl = `https://m.blog.naver.com/${naverIds.blogId}/${naverIds.logNo}`;
+                const mres = await axios.get(mobileUrl, { timeout: 20000, headers: { ...headers, Referer: url } });
+                html = mres.data || '';
                 $ = cheerio.load(html);
             }
 
@@ -446,6 +455,28 @@ class BlogScraper {
         } finally {
             await this.close();
         }
+    }
+
+}
+
+function extractNaverIds(originalUrl, frameSrc) {
+    try {
+        const candidates = [];
+        if (originalUrl) candidates.push(originalUrl);
+        if (frameSrc) candidates.push(frameSrc);
+        for (const u of candidates) {
+            // 형식 1: https://blog.naver.com/romance1019/223955744055
+            let m = u.match(/blog\.naver\.com\/([^/?#]+)\/(\d{6,})/);
+            if (m) return { blogId: m[1], logNo: m[2] };
+            // 형식 2: PostView.naver?blogId=...&logNo=...
+            const uu = new URL(u, 'https://blog.naver.com');
+            const bid = uu.searchParams.get('blogId');
+            const lno = uu.searchParams.get('logNo');
+            if (bid && lno) return { blogId: bid, logNo: lno };
+        }
+        return null;
+    } catch (_) {
+        return null;
     }
 }
 
