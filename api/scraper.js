@@ -1,6 +1,7 @@
 const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
 const cheerio = require('cheerio');
+const axios = require('axios');
 
 class BlogScraper {
     constructor() {
@@ -9,34 +10,79 @@ class BlogScraper {
 
     async init() {
         const isServerless = !!process.env.VERCEL;
-
-        if (isServerless) {
-            this.browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-                ignoreHTTPSErrors: true
-            });
-        } else {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu',
-                    '--no-zygote',
-                    '--single-process'
-                ]
-            });
+        try {
+            if (isServerless) {
+                // 권장 설정 (서버리스)
+                chromium.setHeadlessMode = true;
+                chromium.setGraphicsMode = false;
+                this.browser = await puppeteer.launch({
+                    args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: await chromium.executablePath(),
+                    headless: chromium.headless,
+                    ignoreHTTPSErrors: true
+                });
+            } else {
+                this.browser = await puppeteer.launch({
+                    headless: 'new',
+                    args: [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--no-zygote',
+                        '--single-process'
+                    ]
+                });
+            }
+        } catch (error) {
+            console.error('Puppeteer 브라우저 실행 실패, 간이 크롤링으로 대체합니다:', error.message);
+            this.browser = null; // fallback 사용
         }
+    }
+
+    async fallbackScrape(url, platformHint) {
+        const response = await axios.get(url, { timeout: 15000, headers: { 'User-Agent': 'Mozilla/5.0' } });
+        const html = response.data || '';
+        const $ = cheerio.load(html);
+        let title = $('h1').first().text().trim() || $('title').first().text().trim() || '제목을 찾을 수 없습니다';
+        // 본문 후보 선택자
+        const selectors = ['article', 'main', '.content', '.post', '.entry', 'body'];
+        let content = '';
+        for (const sel of selectors) {
+            const el = $(sel).first();
+            if (el && el.text()) {
+                content = el.text().replace(/\s+/g, ' ').trim();
+                if (content.length > 200) break;
+            }
+        }
+        const imageCount = $('img').length;
+        const linkCount = $('a[href]').length;
+        const charWithSpace = content.length;
+        const charWithoutSpace = content.replace(/\s/g, '').length;
+        const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
+        return {
+            platform: platformHint || 'website',
+            title,
+            content: content || '본문을 찾을 수 없습니다',
+            charWithSpace,
+            charWithoutSpace,
+            wordCount,
+            imageCount,
+            linkCount,
+            scrapingMethod: 'fallback: axios + cheerio',
+            success: true
+        };
     }
 
     async scrapeNaverBlog(url) {
         console.log('네이버 블로그 크롤링 시작:', url);
 
         try {
+            if (!this.browser) {
+                // 서버리스에서 브라우저 구동 실패 시 간이 크롤링 사용
+                return await this.fallbackScrape(url, 'naver');
+            }
             const page = await this.browser.newPage();
 
             // User-Agent 설정 (네이버 차단 방지)
@@ -147,6 +193,9 @@ class BlogScraper {
         console.log('티스토리 블로그 크롤링 시작:', url);
 
         try {
+            if (!this.browser) {
+                return await this.fallbackScrape(url, 'tistory');
+            }
             const page = await this.browser.newPage();
             await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 
@@ -223,6 +272,9 @@ class BlogScraper {
         console.log('일반 웹사이트 크롤링 시작:', url);
 
         try {
+            if (!this.browser) {
+                return await this.fallbackScrape(url, 'website');
+            }
             const page = await this.browser.newPage();
             await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 
