@@ -37,7 +37,70 @@
     </div>
 
     <script>window.API_BASE = 'https://blog-analyzer-tau.vercel.app';</script>
-    <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const analyzeBtn = document.getElementById('analyze-btn');
+      const urlInput = document.getElementById('blog-url');
+      const platformSelect = document.getElementById('blog-type');
+      const resultBox = document.getElementById('result');
+      const resultText = document.getElementById('result-text');
+
+      const API_BASE = (window.API_BASE || '').replace(/\/$/, '');
+
+      async function callAnalyzeAPI(url, platform) {
+        const base = API_BASE || '';
+        const endpoint = `${base}/api/analyze`;
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, platform })
+        });
+        let data; try { data = await res.json(); } catch (_) { data = null; }
+        if (!res.ok) {
+          const message = (data && (data.error || data.details)) ? `${data.error}: ${data.details}` : `요청 실패 (${res.status})`;
+          throw new Error(message);
+        }
+        if (data && data.success === false) {
+          throw new Error(data.error || '분석 실패');
+        }
+        return data;
+      }
+
+      function renderResult(data) {
+        const { overall, seo, aeo, title, platform, wordCount, imageCount, keywords, suggestions } = data;
+        const keywordLines = Array.isArray(keywords)
+          ? keywords.map(k => (k.word ? `${k.word} (${k.count})` : k.content)).slice(0, 5).join(', ')
+          : '';
+        const suggestionLines = Array.isArray(suggestions)
+          ? suggestions.slice(0, 5).map(s => (typeof s === 'string' ? s : s.content)).map(s => `- ${s}`).join('\n')
+          : '';
+        resultText.textContent = '';
+        resultText.innerText = `제목: ${title}\n플랫폼: ${platform}\n단어 수: ${wordCount} / 이미지: ${imageCount}\n\n종합 점수: ${overall}\n- SEO: ${seo}\n- AEO: ${aeo}\n\n키워드: ${keywordLines}\n\n개선 제안:\n${suggestionLines}`;
+        resultBox.classList.remove('hidden');
+      }
+
+      if (analyzeBtn && urlInput && platformSelect && resultBox && resultText) {
+        analyzeBtn.addEventListener('click', async () => {
+          const url = urlInput.value.trim();
+          const platform = platformSelect.value;
+          if (!url) { alert('URL을 입력하세요.'); return; }
+          analyzeBtn.disabled = true;
+          analyzeBtn.textContent = '분석 중...';
+          resultBox.classList.remove('hidden');
+          resultText.innerText = '서버에서 크롤링 및 분석 중입니다. 잠시만 기다려주세요...';
+          try {
+            const data = await callAnalyzeAPI(url, platform);
+            renderResult(data);
+          } catch (e) {
+            resultText.innerText = `오류: ${e.message}\n\nGitHub Pages에서 실행 중이라면 window.API_BASE를 Vercel API 도메인으로 설정하세요.\n예: <script>window.API_BASE = 'https://YOUR_VERCEL_APP.vercel.app'</script>`;
+          } finally {
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = '분석하기';
+          }
+        });
+      }
+    });
+    </script>
 
 </body>
 

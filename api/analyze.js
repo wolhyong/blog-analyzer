@@ -227,7 +227,8 @@ module.exports = async (req, res) => {
 
     } catch (error) {
         console.error('분석 중 오류:', error);
-        return res.status(500).json({
+        return res.status(200).json({
+            success: false,
             error: '서버 오류가 발생했습니다',
             details: error.message
         });
