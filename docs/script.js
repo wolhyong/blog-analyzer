@@ -45,15 +45,17 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({ url, platform })
         });
+        let data;
+        try { data = await res.json(); } catch (_) { data = null; }
         if (!res.ok) {
-            let message = `요청 실패 (${res.status})`;
-            try {
-                const err = await res.json();
-                if (err && err.error) message = err.error;
-            } catch (_) { /* ignore */ }
+            const message = (data && (data.error || data.details)) ? `${data.error}: ${data.details}` : `요청 실패 (${res.status})`;
             throw new Error(message);
         }
-        return res.json();
+        // 서버가 200으로 에러를 반환하는 경우(success: false)도 처리
+        if (data && data.success === false) {
+            throw new Error(data.error || '분석 실패');
+        }
+        return data;
     }
 
     function renderResult(data) {

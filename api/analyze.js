@@ -199,12 +199,13 @@ module.exports = async (req, res) => {
 
         console.log(`분석 시작: ${platform} - ${url}`);
 
-        // 크롤링 실행
+        // 크롤링 실행 (서버리스 안정성 강화를 위해 폴백 우선)
         const scraper = new BlogScraper();
         const scrapedData = await scraper.scrape(url, platform);
 
         if (!scrapedData.success) {
-            return res.status(500).json({
+            return res.status(200).json({
+                success: false,
                 error: '크롤링 실패',
                 details: scrapedData.error
             });

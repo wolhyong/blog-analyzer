@@ -12,16 +12,9 @@ class BlogScraper {
         const isServerless = !!process.env.VERCEL;
         try {
             if (isServerless) {
-                // 권장 설정 (서버리스)
-                chromium.setHeadlessMode = true;
-                chromium.setGraphicsMode = false;
-                this.browser = await puppeteer.launch({
-                    args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: await chromium.executablePath(),
-                    headless: chromium.headless,
-                    ignoreHTTPSErrors: true
-                });
+                // 서버리스에서는 안정성을 위해 기본적으로 폴백 크롤링을 사용
+                // (헤드리스 크로미움은 메모리/권한 문제로 실패하는 경우가 많음)
+                this.browser = null;
             } else {
                 this.browser = await puppeteer.launch({
                     headless: 'new',
