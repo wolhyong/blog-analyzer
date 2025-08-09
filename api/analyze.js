@@ -191,6 +191,12 @@ module.exports = async (req, res) => {
         }
 
         const BlogScraper = require('./scraper');
+        // 입력 검증 강화
+        try {
+            new URL(url);
+        } catch (_) {
+            return res.status(200).json({ success: false, error: '잘못된 URL 형식입니다' });
+        }
         const { url, platform } = body;
 
         if (!url || !platform) {

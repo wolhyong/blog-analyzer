@@ -93,7 +93,18 @@
             renderResult(data);
           } catch (e) {
             const exampleLine = "window.API_BASE = 'https://YOUR_VERCEL_APP.vercel.app'";
-            resultText.innerText = `오류: ${e.message}\n\nGitHub Pages에서 실행 중이라면 window.API_BASE를 Vercel API 도메인으로 설정하세요.\n예: ${exampleLine}`;
+            // 서버가 { success:false, error, details }를 보낸 경우 details 표시 시도
+            if (e && e.response && typeof e.response.json === 'function') {
+              try {
+                const errJson = await e.response.json();
+                const details = errJson && (errJson.details || errJson.error || '');
+                resultText.innerText = `오류: ${e.message}${details ? `\n세부: ${details}` : ''}`;
+              } catch (_) {
+                resultText.innerText = `오류: ${e.message}`;
+              }
+            } else {
+              resultText.innerText = `오류: ${e.message}\n\nGitHub Pages에서 실행 중이라면 window.API_BASE를 Vercel API 도메인으로 설정하세요.\n예: ${exampleLine}`;
+            }
           } finally {
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '분석하기';
