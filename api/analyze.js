@@ -1,4 +1,5 @@
-const BlogScraper = require('./scraper');
+// BlogScraper는 OPTIONS 등 프리플라이트에서 불필요한 모듈 로딩을 유발할 수 있으므로
+// 실제 POST 처리 시점에 동적 로드합니다.
 
 // AI 분석 시뮬레이션 (실제로는 Gemma API 호출)
 function analyzeContent(scrapedData) {
@@ -180,6 +181,16 @@ module.exports = async (req, res) => {
     }
 
     try {
+        // POST 본문이 없는 경우 대비 (일부 프록시/브라우저 환경)
+        if (!req.body || typeof req.body !== 'object') {
+            try {
+                req.body = JSON.parse(req.rawBody || '{}');
+            } catch (_) {
+                // 무시하고 기존 처리로 진행
+            }
+        }
+
+        const BlogScraper = require('./scraper');
         const { url, platform } = req.body;
 
         if (!url || !platform) {

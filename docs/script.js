@@ -35,10 +35,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const API_BASE = (window.API_BASE || '').replace(/\/$/, '');
 
     async function callAnalyzeAPI(url, platform) {
-        const endpoint = `${API_BASE}/api/analyze`;
+        // API_BASE가 비어 있으면 동일 도메인으로 시도
+        const base = API_BASE || '';
+        const endpoint = `${base}/api/analyze`;
         const res = await fetch(endpoint, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ url, platform })
         });
         if (!res.ok) {
