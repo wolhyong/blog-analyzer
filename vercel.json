@@ -4,10 +4,7 @@
     "functions": {
         "api/analyze.js": {
             "maxDuration": 60,
-            "memory": 1024,
-            "environment": {
-                "NODE_OPTIONS": "--enable-source-maps"
-            }
+            "memory": 1024
         }
     },
     "headers": [
