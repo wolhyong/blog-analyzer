@@ -1,15 +1,3 @@
-// 런타임 웹 API 폴리필 (Node 18 환경에서 File/FormData 미정의 문제 대응)
-try {
-    const { fetch, Headers, Request, Response, FormData, File, Blob } = require('undici');
-    if (typeof globalThis.fetch === 'undefined') globalThis.fetch = fetch;
-    if (typeof globalThis.Headers === 'undefined') globalThis.Headers = Headers;
-    if (typeof globalThis.Request === 'undefined') globalThis.Request = Request;
-    if (typeof globalThis.Response === 'undefined') globalThis.Response = Response;
-    if (typeof globalThis.FormData === 'undefined') globalThis.FormData = FormData;
-    if (typeof globalThis.File === 'undefined') globalThis.File = File;
-    if (typeof globalThis.Blob === 'undefined') globalThis.Blob = Blob;
-} catch (_) { /* ignore */ }
-
 // BlogScraper는 OPTIONS 등 프리플라이트에서 불필요한 모듈 로딩을 유발할 수 있으므로
 // 실제 POST 처리 시점에 동적 로드합니다.
 
@@ -192,27 +180,48 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    // 요청 본문 파서 (Vercel 런타임에서 req.body 미설정 케이스 대응)
+    async function parseRequestBody(req) {
+        try {
+            if (req.body && typeof req.body === 'object') return req.body;
+            if (typeof req.body === 'string') {
+                try { return JSON.parse(req.body); } catch (_) { /* ignore */ }
+            }
+            // raw stream 읽기
+            const raw = await new Promise((resolve) => {
+                let data = '';
+                req.on('data', (chunk) => { data += chunk; });
+                req.on('end', () => resolve(data));
+            });
+            try { return JSON.parse(raw || '{}'); } catch (_) { return {}; }
+        } catch (_) {
+            return {};
+        }
+    }
+
     try {
-        // 본문 안전 파싱
-        let body = req.body;
-        if (typeof body === 'string') {
-            try { body = JSON.parse(body); } catch (_) { body = {}; }
-        }
-        if (!body || typeof body !== 'object') {
-            body = {};
-        }
+        const body = await parseRequestBody(req);
 
         const BlogScraper = require('./scraper');
-        // 입력 검증 강화
-        try {
-            new URL(url);
-        } catch (_) {
-            return res.status(200).json({ success: false, error: '잘못된 URL 형식입니다' });
+        const { url: urlRaw, platform } = body;
+
+        // URL 정규화
+        let url = '';
+        if (typeof urlRaw === 'string') {
+            url = urlRaw.trim();
+        } else if (urlRaw && typeof urlRaw === 'object' && typeof urlRaw.url === 'string') {
+            url = urlRaw.url.trim();
+        } else if (Array.isArray(urlRaw) && urlRaw.length) {
+            url = String(urlRaw[0]).trim();
         }
-        const { url, platform } = body;
 
         if (!url || !platform) {
             return res.status(200).json({ success: false, error: 'URL and platform are required' });
+        }
+
+        // URL 형식 검증
+        try { new URL(url); } catch (e) {
+            return res.status(200).json({ success: false, error: '잘못된 URL 형식입니다', details: `value=${JSON.stringify(url).slice(0,120)}` });
         }
 
         console.log(`분석 시작: ${platform} - ${url}`);
